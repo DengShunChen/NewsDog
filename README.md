@@ -1,60 +1,71 @@
 # NewsDog
 
-A simple Flask-based news collector with a magical newspaper-style UI. This project demonstrates a basic setup for collecting news, translating content, tracking popular articles, and managing user logins. Everything runs with Docker Compose.
+**NewsDog** 是一個智慧新聞助理，它能自動抓取最新的網路新聞，並利用大型語言模型 (LLM) 進行深度分析與整理，為您打造一份個人化的專業報紙。
 
-## Features
-- Fetch and display news articles
-- Translate content to a selected language
-- Basic user login/logout with `Flask-Login`
-- Placeholder for Gemini AI integration
-- Tracks article views to highlight popular news
+這個專案的目標是解決資訊過載的問題，讓使用者能快速掌握自己感興趣領域的最新動態。
 
-## Running
-Make sure you have Docker and Docker Compose installed.
+## 核心功能
 
-```bash
-docker compose up --build
-```
+- **自動新聞抓取**：從多個來源自動獲取新聞文章。
+- **智慧內容分析**：整合 Google AI (Gemini) 模型，對新聞進行摘要、分類和趨勢分析。
+- **個人化報紙生成**：根據使用者設定的關鍵字，動態生成一份結構化的新聞報紙。
+- **使用者管理**：基本的登入/登出功能，由 `Flask-Login` 提供支援。
+- **多國語言翻譯**：提供即時的內容翻譯功能 (佔位符)。
 
-The app will be available at `http://localhost:5000`.
+## 技術架構
 
-## Configuration
+本專案採用容器化技術，主要由以下幾個部分組成：
 
-### Secret Key
-The application uses a `SECRET_KEY` for session management and other security-related features. This key is loaded from an environment variable.
+- **後端**：使用 **Python Flask** 框架開發，負責處理核心業務邏輯、API 端點和使用者驗證。
+- **前端**：基於 Flask 的 **Templates** 和 **Static** 資料夾，提供基本的使用者操作介面。
+- **AI 模型**：串接 **Google AI (Gemini)** 進行自然語言處理。
+- **部署**：透過 **Docker Compose** 進行一鍵部署，簡化開發和執行環境的設定。
 
-**For Development:**
-- The `docker-compose.yml` file sets a default `SECRET_KEY` for development purposes. You can modify it there:
+## 如何開始
+
+請確保您的電腦已安裝 Docker 和 Docker Compose。
+
+1.  **啟動服務**：
+    在專案根目錄下，執行以下指令來建構並啟動所有服務：
+    ```bash
+    docker compose up --build
+    ```
+    服務啟動後，您可以透過瀏覽器訪問 `http://localhost:5000`。
+
+2.  **登入**：
+    您可以使用 `backend/users.json` 中提供的預設帳號 `admin` 和密碼 `password` 進行登入。
+
+## 環境設定
+
+### 1. Secret Key
+
+本專案使用 `SECRET_KEY` 來保護使用者會話 (session) 的安全。
+
+- **開發環境**：`docker-compose.yml` 中已設定一組預設的開發金鑰。
+- **生產環境**：強烈建議您在生產環境中設定一個獨立且強度更高的金鑰。
+
+### 2. Google AI API 金鑰
+
+為了啟用 LLM 的分析功能，您需要在環境變數中設定您的 Google AI API 金鑰。
+
+- 在 `docker-compose.yml` 檔案中，為 `web` 服務新增一個環境變數：
   ```yaml
   services:
     web:
       # ...
       environment:
-        SECRET_KEY: 'your_new_development_secret_key_here'
+        SECRET_KEY: 'your_development_secret_key_here'
+        GOOGLE_API_KEY: 'YOUR_GOOGLE_AI_API_KEY' # <--- 在這裡貼上您的金鑰
   ```
-- Alternatively, you can set this variable in your shell environment if you modify `docker-compose.yml` to use environment variable substitution (e.g., `SECRET_KEY: ${SECRET_KEY_FROM_HOST}`).
+- **重要**：請勿將您的 API 金鑰直接提交到版本控制系統中。
 
-**For Production:**
-- **It is crucial to use a strong, unique secret key for production.** Do not use the default development key.
-- Set the `SECRET_KEY` environment variable in your production environment. The method for doing this will depend on your deployment platform (e.g., Docker Swarm secrets, Kubernetes secrets, platform-specific environment variable settings). A strong key can be generated using Python:
-  ```python
-  import secrets
-  secrets.token_hex(32)
-  ```
+## 未來藍圖
 
-### User Data
-User authentication data is loaded from `backend/users.json`. This file contains a simple JSON object mapping usernames to their password information.
+我們歡迎所有感興趣的開發者一起參與 NewsDog 的開發！以下是我們規劃中的一些新功能：
 
-**Example `backend/users.json`:**
-```json
-{
-  "admin": {
-    "password": "password"
-  }
-}
-```
+- [ ] **增加更多新聞來源**：擴充新聞爬蟲，支援更多不同類型的新聞網站。
+- [ ] **優化 AI 分析提示 (Prompts)**：設計更精準的提示，以提升新聞摘要和分類的品質。
+- [ ] **建立歷史存檔**：將分析過的新聞儲存到資料庫中，供日後查詢。
+- [ ] **使用者自訂關鍵字**：在網站介面上提供一個讓使用者能動態新增/刪除感興趣關鍵字的功能。
 
-**Important Security Note:**
-The `backend/users.json` file is included in the project's `.gitignore` file. This is a security measure to prevent accidental commitment of user credentials to the version control system. Even though it currently contains dummy data, in a real-world scenario, this file would hold sensitive information.
-- For development, you can manually create and manage this file.
-- For production, you should ensure this file is properly secured and managed outside of the repository, or consider using a more robust user management system (e.g., a database with hashed passwords).
+如果您對開發新功能感興趣，請參考我們的 `CONTRIBUTING.md` 文件。
