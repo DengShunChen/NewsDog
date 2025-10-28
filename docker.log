@@ -1,0 +1,65 @@
+time="2025-10-28T03:54:42Z" level=warning msg="/app/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+#1 [internal] load local bake definitions
+#1 reading from stdin 457B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 183B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.11-slim
+#3 DONE 0.2s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [1/5] FROM docker.io/library/python:3.11-slim@sha256:8eb5fc663972b871c528fef04be4eaa9ab8ab4539a5316c4b8c133771214a617
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 transferring context: 8.86kB done
+#6 DONE 0.0s
+
+#7 [3/5] COPY requirements.txt .
+#7 CACHED
+
+#8 [2/5] WORKDIR /app
+#8 CACHED
+
+#9 [4/5] RUN pip install --no-cache-dir -r requirements.txt
+#9 CACHED
+
+#10 [5/5] COPY . .
+#10 DONE 2.9s
+
+#11 exporting to image
+#11 exporting layers
+#11 exporting layers 0.3s done
+#11 writing image sha256:cc46994dab3a608afc563a09e5a021a071d1dccbaba32d6e2c09046ebbc6762b done
+#11 naming to docker.io/library/app-web done
+#11 DONE 0.4s
+
+#12 resolving provenance for metadata file
+#12 DONE 0.0s
+ app-web  Built
+ Container app-web-1  Recreate
+ Container app-web-1  Recreated
+Attaching to web-1
+web-1  |  * Serving Flask app 'app'
+web-1  |  * Debug mode: off
+web-1  | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+web-1  |  * Running on all addresses (0.0.0.0)
+web-1  |  * Running on http://127.0.0.1:5000
+web-1  |  * Running on http://172.18.0.2:5000
+web-1  | [33mPress CTRL+C to quit[0m
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:08] "GET / HTTP/1.1" 200 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:08] "[33mGET /static/styles.css HTTP/1.1[0m" 404 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:10] "GET /login HTTP/1.1" 200 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:10] "[33mGET /static/styles.css HTTP/1.1[0m" 404 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:11] "[32mPOST /login HTTP/1.1[0m" 302 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:11] "GET / HTTP/1.1" 200 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:11] "[33mGET /static/styles.css HTTP/1.1[0m" 404 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:11] "[32mGET /logout HTTP/1.1[0m" 302 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:11] "GET / HTTP/1.1" 200 -
+web-1  | 172.18.0.1 - - [28/Oct/2025 03:55:11] "[33mGET /static/styles.css HTTP/1.1[0m" 404 -

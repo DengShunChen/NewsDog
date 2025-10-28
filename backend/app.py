@@ -1,13 +1,20 @@
 import os
 import json
-from flask import Flask, render_template, request, redirect, url_for, session
+import requests
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, UserMixin
+from urllib.parse import quote
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'a_default_fallback_key_if_not_set')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+
+# In-memory store for view counts
+view_counts = {}
 
 # Load users from users.json
 USERS = {}
@@ -60,19 +67,45 @@ def load_user(user_id):
 def index():
     """Renders the main page with a list of news articles.
 
-    This is the main view of the application. It currently uses placeholder
-    data for the news articles.
+    This view fetches news from the SauravKanchan/NewsAPI and displays them.
 
     Returns:
         str: The rendered HTML of the main page.
     """
-    # This would normally fetch news from an API
-    # Placeholder news data. Replace this with a real news fetching mechanism.
-    news_list = [
-        {'title': 'Placeholder News Title 1', 'content': 'This is sample news content. Integrate a real news API here.'},
-        {'title': 'Placeholder News Title 2', 'content': 'Another piece of sample news. This should be dynamically fetched.'},
-    ]
+    news_api_url = "https://saurav.tech/NewsAPI/top-headlines/category/general/in.json"
+    try:
+        response = requests.get(news_api_url)
+        response.raise_for_status()  # Raise an exception for bad status codes
+        news_data = response.json()
+        news_list = news_data.get('articles', [])
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching news: {e}")
+        news_list = []
+        flash('Could not fetch news articles. Please try again later.', 'error')
+
+
+    # Add view counts to each article
+    for article in news_list:
+        article['views'] = view_counts.get(article['url'], 0)
+        article['encoded_url'] = quote(article['url'], safe='')
+
+
     return render_template('index.html', news_list=news_list)
+
+
+@app.route('/view/<path:article_url>')
+def view_article(article_url):
+    """Tracks a view for an article and redirects to the article's URL.
+
+    Args:
+        article_url (str): The URL of the article to view.
+
+    Returns:
+        werkzeug.wrappers.response.Response: A redirect to the article's URL.
+    """
+    # Increment the view count for the article
+    view_counts[article_url] = view_counts.get(article_url, 0) + 1
+    return redirect(article_url)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -93,7 +126,10 @@ def login():
         if username in USERS and USERS[username]['password'] == password:
             user = User(username)
             login_user(user)
+            flash('Logged in successfully!', 'success')
             return redirect(url_for('index'))
+        else:
+            flash('Invalid username or password.', 'error')
     return render_template('login.html')
 
 
@@ -109,6 +145,7 @@ def logout():
         werkzeug.wrappers.response.Response: A redirect to the main page.
     """
     logout_user()
+    flash('You have been logged out.', 'success')
     return redirect(url_for('index'))
 
 

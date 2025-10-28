@@ -1,13 +1,53 @@
-{% extends 'base.html' %}
-{% block content %}
-<h1>Magical News</h1>
-<div class="news-list">
-    {% for item in news_list %}
-    <div class="news-item">
-        <h2>{{ item.title }}</h2>
-        <p>{{ item.content }}</p>
-    </div>
-    {% endfor %}
-</div>
-<p>Gemini AI: <span id="gemini-placeholder">[AI content here]</span></p>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsDog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>NewsDog</h1>
+        <nav>
+            {% if current_user.is_authenticated %}
+                <span>Welcome, {{ current_user.id }}</span>
+                <a href="{{ url_for('logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <div class="news-grid">
+            {% for news in news_list %}
+                <div class="news-card">
+                    {% if news.urlToImage %}
+                        <img src="{{ news.urlToImage }}" alt="{{ news.title }}">
+                    {% endif %}
+                    <h2><a href="{{ url_for('view_article', article_url=news.encoded_url) }}" target="_blank">{{ news.title }}</a></h2>
+                    <p>{{ news.content }}</p>
+                    <div class="card-footer">
+                        <span class="views">Views: {{ news.views }}</span>
+                        {% if news.source.name %}
+                            <span class="source">Source: {{ news.source.name }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <p>No news available at the moment. Please try again later.</p>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>
